@@ -12,19 +12,23 @@ endif
 APPNAME := radeon-profile
 DESTDIR := $(CURDIR)/debian/$(APPNAME)
 
-build: build-stamp
-build-stamp:
+builddir:
+	mkdir -p builddir
 
+builddir/Makefile: builddir
+	cd builddir && qmake PREFIX=/usr ../$(APPNAME)/$(APPNAME).pro
+
+build: build-stamp
+
+build-stamp: builddir/Makefile
 	# Build process
-	cd $(APPNAME)
-	qmake PREFIX=/usr ./$(APPNAME)/$(APPNAME).pro
-	make $(MY_MAKEFLAGS)
+	cd builddir && make $(MY_MAKEFLAGS)
 	# Generate translations
-	lupdate $(APPNAME)/$(APPNAME).pro
+	#lupdate $(APPNAME)/$(APPNAME).pro
 	lrelease $(APPNAME)/$(APPNAME).pro
 	# End of build process
 
-	touch build-stamp
+	touch $@
 
 clean:
 		dh_testdir
@@ -42,7 +46,7 @@ install: build
 		install -pdm755 $(DESTDIR)/usr/share/applications
 		install -pdm755 $(DESTDIR)/usr/share/pixmaps
 		install -pdm755 $(DESTDIR)/usr/share/$(APPNAME)
-		install -Dm755 $(CURDIR)/target/$(APPNAME) $(DESTDIR)/usr/share/$(APPNAME)
+		install -Dm755 $(CURDIR)/builddir/target/$(APPNAME) $(DESTDIR)/usr/bin/$(APPNAME)
 		install -Dm664 $(CURDIR)/$(APPNAME)/extra/$(APPNAME).desktop $(DESTDIR)/usr/share/applications
 		install -Dm664 $(CURDIR)/$(APPNAME)/extra/$(APPNAME).png $(DESTDIR)/usr/share/pixmaps
 		install -Dm664 $(CURDIR)/$(APPNAME)/translations/*.qm $(DESTDIR)/usr/share/$(APPNAME)
@@ -58,7 +62,6 @@ binary-arch: build install
 		dh_installdocs
 		dh_installexamples
 		dh_installman
-		dh_link /usr/share/$(APPNAME)/$(APPNAME) /usr/bin/$(APPNAME)
 		#dh_strip --dbg-package=my-application-dbg
 		dh_compress
 		dh_fixperms

@@ -1,3 +1,10 @@
+radeon-profile (20211116~ubuntu20.04.1) focal; urgency=low
+
+  * Merge https://github.com/FMeinicke/radeon-profile/tree/restore-fan-after-sleep
+  * Build improvements
+
+ -- spezifisch <spezifisch@users.noreply.github.com>  Tue, 16 Nov 2021 15:41:02 +0000
+
 radeon-profile (20200824~ubuntu20.04.1) focal; urgency=low
 
   * Auto build.
