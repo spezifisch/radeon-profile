@@ -1,0 +1,30 @@
+Source: radeon-profile
+Section: x11
+Priority: optional
+Maintainer: gogo <trebelnik2@gmail.com>
+Uploaders: gogo <trebelnik2@gmail.com>
+Build-Depends: debhelper (>= 9),
+               build-essential,
+               xserver-xorg-video-ati,
+               xserver-xorg-video-amdgpu,
+               mesa-common-dev,
+               libgl1-mesa-dev,
+               libglu1-mesa-dev,
+               libqt5charts5-dev,
+               qt5-default | libqt5charts5-dev,
+               qttools5-dev-tools,
+               gcc, gdb,
+#               libqt4-dev,
+#               qt4-qmake,
+               qt5-qmake,
+               libxrandr2,
+               libxrandr-dev
+Standards-Version: 3.9.4
+Homepage: https://github.com/marazmista/radeon-profile
+
+Package: radeon-profile
+Architecture: any
+Depends: xserver-xorg-video-ati | xserver-xorg-video-amdgpu, mesa-utils, x11-utils, libxrandr2, libdrm-dev, qt59charts-no-lgpl | libqt5charts5, radeon-profile-daemon
+Description: AMD graphics card monitoring and tweaking tool.
+ Radeon Profile, open source AMD graphics card monitoring and tweaking tool.
+ It supports open source drivers and fglrx.

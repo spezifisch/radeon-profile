@@ -1,0 +1,72 @@
+#!/usr/bin/make -f
+#export DH_VERBOSE=1
+# This is the debhelper compatability version to use.
+
+MY_MAKEFLAGS=
+ifneq (,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
+  NUMJOBS=$(patsubst parallel=%,%,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
+  MY_MAKEFLAGS=-j$(NUMJOBS)
+endif
+
+#export DH_COMPAT=3
+APPNAME := radeon-profile
+DESTDIR := $(CURDIR)/debian/$(APPNAME)
+
+build: build-stamp
+build-stamp:
+
+	# Build process
+	cd $(APPNAME)
+	qmake PREFIX=/usr ./$(APPNAME)/$(APPNAME).pro
+	make $(MY_MAKEFLAGS)
+	# Generate translations
+	lupdate $(APPNAME)/$(APPNAME).pro
+	lrelease $(APPNAME)/$(APPNAME).pro
+	# End of build process
+
+	touch build-stamp
+
+clean:
+		dh_testdir
+		dh_testroot
+		rm -f build-stamp
+		# Add here commands to clean up after the build process.
+		dh_clean
+		
+install: build
+		dh_testdir
+		dh_testroot
+		dh_prep
+		dh_installdirs
+		install -pdm755 $(DESTDIR)/usr/bin
+		install -pdm755 $(DESTDIR)/usr/share/applications
+		install -pdm755 $(DESTDIR)/usr/share/pixmaps
+		install -pdm755 $(DESTDIR)/usr/share/$(APPNAME)
+		install -Dm755 $(CURDIR)/target/$(APPNAME) $(DESTDIR)/usr/share/$(APPNAME)
+		install -Dm664 $(CURDIR)/$(APPNAME)/extra/$(APPNAME).desktop $(DESTDIR)/usr/share/applications
+		install -Dm664 $(CURDIR)/$(APPNAME)/extra/$(APPNAME).png $(DESTDIR)/usr/share/pixmaps
+		install -Dm664 $(CURDIR)/$(APPNAME)/translations/*.qm $(DESTDIR)/usr/share/$(APPNAME)
+
+# Build architecture-independent files here.
+binary-indep: build install
+# We have nothing to do by default.
+
+# Build architecture-dependent files here.
+binary-arch: build install
+		dh_testdir
+		dh_testroot
+		dh_installdocs
+		dh_installexamples
+		dh_installman
+		dh_link /usr/share/$(APPNAME)/$(APPNAME) /usr/bin/$(APPNAME)
+		#dh_strip --dbg-package=my-application-dbg
+		dh_compress
+		dh_fixperms
+		dh_installdeb
+		dh_shlibdeps
+		dh_gencontrol
+		dh_md5sums
+		dh_builddeb
+
+binary: binary-indep binary-arch
+.PHONY: build clean binary-indep binary-arch binary install configure
